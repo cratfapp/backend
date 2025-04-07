@@ -1,0 +1,22 @@
+name: Deploy Apps
+on:
+  push:
+    branches: [ "master" ]
+    paths: 
+      - "frontend/**"
+      - "backend/**"
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cd backend && docker build -t backend-image .
+      - run: aws ecr push backend-image:latest  # Push to ECR (App Runner will auto-deploy)
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cd frontend && npm install && npm run build
+      - run: aws s3 sync ./frontend/dist s3://my-project-frontend --delete
