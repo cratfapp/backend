@@ -1,3 +1,15 @@
+variable "AWS_ACCESS_KEY_ID" {
+  description = "AWS Access Key ID"
+  type        = string
+  sensitive   = true
+}
+
+variable "AWS_SECRET_ACCESS_KEY" {
+  description = "AWS Secret Access Key"
+  type        = string
+  sensitive   = true
+}
+
 variable "customer_name" {
   type        = string
   description = "Name of the customer/project"
