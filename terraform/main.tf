@@ -33,15 +33,25 @@ resource "aws_apprunner_connection" "github_connection" {
 }
 
 # Configure GitHub repository to allow App Runner access
-resource "github_repository_webhook" "apprunner_webhook" {
+data "github_repository_webhooks" "existing" {
   repository = var.github_repo_name
+}
+
+locals {
+  existing_hook = [for hook in data.github_repository_webhooks.existing.webhooks : 
+    hook if can(regex("apprunner", hook.configuration[0].url))][0]
+}
+
+resource "github_repository_webhook" "apprunner_webhook" {
+  count = length(local.existing_hook) > 0 ? 0 : 1
   
+  repository = var.github_repo_name
   configuration {
     url          = "https://api.apprunner.${var.aws_region}.amazonaws.com"
     content_type = "json"
     insecure_ssl = false
+    secret       = random_string.webhook_secret.result
   }
-
   active = true
   events = ["push"]
 }
@@ -104,4 +114,7 @@ output "apprunner_service_url" {
 
 output "github_connection_arn" {
   value = aws_apprunner_connection.github_connection.arn
+}
+output "webhook_url" {
+  value = length(local.existing_hook) > 0 ? local.existing_hook.configuration[0].url : github_repository_webhook.apprunner_webhook[0].configuration[0].url
 }
