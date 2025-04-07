@@ -23,7 +23,7 @@ provider "github" {
 
 # Create GitHub connection for App Runner
 resource "aws_apprunner_connection" "github_connection" {
-  connection_name = "${var.customer_name}-github-connection"
+  connection_name = "new-connection"
   provider_type   = "GITHUB"
   
   tags = {
