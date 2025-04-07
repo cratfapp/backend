@@ -1,3 +1,9 @@
+variable "github_token" {
+  description = "GitHub personal access token"
+  type        = string
+  sensitive   = true
+}
+
 variable "AWS_ACCESS_KEY_ID" {
   description = "AWS Access Key ID"
   type        = string
