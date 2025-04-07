@@ -1,43 +1,56 @@
 name: Deploy Infrastructure
+
 on:
   push:
     branches: [ "main" ]
 
+env:
+  AWS_REGION: "eu-north-1"
+  TF_VERSION: "1.5.0"
+
 jobs:
-  terraform:
+  deploy:
     runs-on: ubuntu-latest
-
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_DEFAULT_REGION: "eu-north-1"
-
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init
-        run: terraform -chdir=terraform init -input=false
+        run: terraform -chdir=terraform init
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          TF_VAR_github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Terraform Plan
-        run: terraform -chdir=terraform plan -input=false -out=tfplan
+        run: |
+          terraform -chdir=terraform plan \
+            -var="customer_name=new-monorepo" \
+            -var="github_org_name=cratfapp" \
+            -var="github_repo_name=backend" \
+            -var="github_branch=master"
         env:
-          TF_VAR_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          
+          TF_VAR_github_token: ${{ secrets.GITHUB_TOKEN }}
+          TF_VAR_aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          TF_VAR_aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Terraform Apply
-        run: terraform -chdir=terraform apply -input=false tfplan
+        run: |
+          terraform -chdir=terraform apply -auto-approve \
+            -var="customer_name=new-monorepo" \
+            -var="github_org_name=cratfapp" \
+            -var="github_repo_name=backend" \
+            -var="github_branch=master"
         env:
-          TF_VAR_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          TF_VAR_website_files_path: ${{ github.workspace }}/website
-          -var="customer_name=new-monorepo" \
-          -var="github_org_name=cratfapp" \
-          -var="github_repo_name=backend" \
-          -var="github_branch=master"
+          TF_VAR_github_token: ${{ secrets.GITHUB_TOKEN }}
+          TF_VAR_aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          TF_VAR_aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
