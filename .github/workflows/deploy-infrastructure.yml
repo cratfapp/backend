@@ -29,7 +29,7 @@ jobs:
       - name: Terraform Init
         run: terraform -chdir=terraform init
         env:
-          TF_VAR_github_token: ${{ secrets.GITHUB_TOKEN }}
+          TF_VAR_github_token: ${{ secrets.ORG_TOKEN }}
 
       - name: Terraform Plan
         run: |
@@ -39,7 +39,7 @@ jobs:
             -var="github_repo_name=backend" \
             -var="github_branch=master"
         env:
-          TF_VAR_github_token: ${{ secrets.GITHUB_TOKEN }}
+          TF_VAR_github_token: ${{ secrets.ORG_TOKEN }}
           TF_VAR_aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           TF_VAR_aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
@@ -51,6 +51,6 @@ jobs:
             -var="github_repo_name=backend" \
             -var="github_branch=master"
         env:
-          TF_VAR_github_token: ${{ secrets.GITHUB_TOKEN }}
+          TF_VAR_github_token: ${{ secrets.ORG_TOKEN }}
           TF_VAR_aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           TF_VAR_aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
