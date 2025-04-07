@@ -33,24 +33,24 @@ jobs:
 
       - name: Terraform Plan
         run: |
-          terraform -chdir=terraform plan \
-            -var="customer_name=new-monorepo" \
-            -var="github_org_name=cratfapp" \
-            -var="github_repo_name=backend" \
-            -var="github_branch=master"
+          terraform -chdir=terraform plan
         env:
           TF_VAR_github_token: ${{ secrets.ORG_TOKEN }}
           TF_VAR_aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           TF_VAR_aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          TF_VAR_customer_name: new-monorepo
+          TF_VAR_github_org_name: cratfapp
+          TF_VAR_github_repo_name: backend
+          TF_VAR_github_branch: main
 
       - name: Terraform Apply
         run: |
-          terraform -chdir=terraform apply -auto-approve \
-            -var="customer_name=new-monorepo" \
-            -var="github_org_name=cratfapp" \
-            -var="github_repo_name=backend" \
-            -var="github_branch=master"
+          terraform -chdir=terraform apply -auto-approve
         env:
           TF_VAR_github_token: ${{ secrets.ORG_TOKEN }}
           TF_VAR_aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           TF_VAR_aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          TF_VAR_customer_name: new-monorepo
+          TF_VAR_github_org_name: cratfapp
+          TF_VAR_github_repo_name: backend
+          TF_VAR_github_branch: main
