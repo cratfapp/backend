@@ -20,7 +20,14 @@ provider "github" {
   owner = var.github_org_name
   token = var.github_token
 }
+provider "random" {} # Required for random_string
 
+# Create a secure webhook secret
+resource "random_string" "webhook_secret" {
+  length  = 32
+  special = false
+  upper   = true
+}
 # Create GitHub connection for App Runner
 resource "aws_apprunner_connection" "github_connection" {
   connection_name = "new-connection"
